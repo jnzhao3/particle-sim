@@ -507,20 +507,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1701280284}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b17eb7da55ba3ae43b61723157f3df2a, type: 3}
+  m_Script: {fileID: 11500000, guid: bbd6e017ac405314fa707d1e86d8e0ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   update: 0
+  instances: 0
+  mesh2: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  materials:
+  - {fileID: 2100000, guid: 162bc9ca79d5db84a9ed4b72d55171e3, type: 2}
   width: 64
   height: 64
-  depth: 20
+  depth: 64
   planeSize: 16
-  x_off: -100
-  y_off: 1000
-  z_off: 100
-  frequency: 0.045
-  amplitude: 0.881
-  gameObj: {fileID: 944153594}
+  x_off: 100
+  y_off: 200
+  z_off: 300
+  frequency: 0.011
+  amplitude: 0.973
+  gameObj: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
