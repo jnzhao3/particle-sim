@@ -2,18 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//make sure terrain object is positioned at (0, 0, 0)
+
 //[RequireComponent(typof(MeshFilter))]
 public class plane_generator : MonoBehaviour
 {
     Mesh mesh;
+    // MeshCollider meshCollider;
 
-    Vector3[] vertices;
+    //MAKE vertices AND gridSize STATIC VARIABLES
+    public static Vector3[] vertices;
+
     int[] triangles;
     //public int gridSize = 64; // Change this to set the number of grid cells
     //float planeSize = 16f; // Change this to set the overall size of the plane
 
     [Header("Mesh Settings")]
-    public int gridSize = 64; // Change this to set the number of grid cells
+    public static int gridSize = 64; // Change this to set the number of grid cells
     public float planeSize = 16f;
     public Gradient gradient;
 
@@ -44,10 +49,17 @@ public class plane_generator : MonoBehaviour
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
+
+        //Get comoponent from unity editor?
+        // GetComponent<MeshCollider>//().mesh = mesh;
+
+        // var collider = AddComponent<MeshCollider>();
+        // collider.sharedMesh = mesh;
+
         CreatePlane();
         SetPerlin();
         //GenerateTexture();
-        ApplyTextureToMesh();
+        // ApplyTextureToMesh();
         UpdatePlane();
     }
 
@@ -69,12 +81,16 @@ public class plane_generator : MonoBehaviour
         colors = new Color[vertices.Length]; // Initialize color array
 
         // Initialize vertex positions
+        //z * (gridSize + 1) + x, this is the vertex at the point (x, z)
+        //get the y value at vertex vertices[z * (gridSize + 1) + x]
+        //y value is set in perlin noise 
         for (int z = 0; z <= gridSize; z++)
         {
             for (int x = 0; x <= gridSize; x++)
             {
                 float xPos = (float)x / gridSize * planeSize - planeSize / 2.0f;
                 float zPos = (float)z / gridSize * planeSize - planeSize / 2.0f;
+                // Debug.Log("Plane: " + z + " and " + zPos);
                 vertices[z * (gridSize + 1) + x] = new Vector3(xPos, 0, zPos);
             }
         }
