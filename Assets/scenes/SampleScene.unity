@@ -515,14 +515,14 @@ MonoBehaviour:
   mesh2: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   materials:
   - {fileID: 2100000, guid: 162bc9ca79d5db84a9ed4b72d55171e3, type: 2}
-  width: 64
-  height: 64
-  depth: 64
+  width: 256
+  height: 256
+  depth: 32
   planeSize: 16
   x_off: 100
   y_off: 200
   z_off: 300
-  frequency: 0.011
+  frequency: 0.01
   amplitude: 0.973
   gameObj: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
