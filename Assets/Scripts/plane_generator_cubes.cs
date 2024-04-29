@@ -52,7 +52,10 @@ public class plane_generator_cubes : MonoBehaviour
 
     Texture2D texture;
 
-    struct Triangle {
+    public Gradient worldColor;
+
+    struct Triangle
+    {
         public Vector3 v1;
         public Vector3 v2;
         public Vector3 v3;
@@ -62,18 +65,15 @@ public class plane_generator_cubes : MonoBehaviour
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-        CreatePlane();
-        // SetPerlin();
 
         tables = new Tables();
         InitGrid();
         MarchCubes();
-        //GenerateTexture();
-        // ApplyTextureToMesh();
-        // UpdatePlane();
+        SetColors();
     }
 
-    void InitGrid() {
+    void InitGrid()
+    {
         Grid = new Vector3[gridSize * gridSize * gridSize];
 
         for (int x = 0; x < gridSize; x++)
@@ -92,30 +92,30 @@ public class plane_generator_cubes : MonoBehaviour
     }
 
     float Noise3D(float x, float y, float z, float frequency = 0.2f, float amplitude = 1, float persistence = 0.1f, int octave = 1, int seed = 12)
-	{
-		// float noise = 0.0f;
+    {
+        // float noise = 0.0f;
 
-		// for (int i = 0; i < octave; ++i)
-		// {
-		// 	// Get all permutations of noise for each individual axis
-		// 	float noiseXY = Mathf.PerlinNoise(x * frequency + seed, y * frequency + seed) * amplitude;
-		// 	float noiseXZ = Mathf.PerlinNoise(x * frequency + seed, z * frequency + seed) * amplitude;
-		// 	float noiseYZ = Mathf.PerlinNoise(y * frequency + seed, z * frequency + seed) * amplitude;
+        // for (int i = 0; i < octave; ++i)
+        // {
+        // 	// Get all permutations of noise for each individual axis
+        // 	float noiseXY = Mathf.PerlinNoise(x * frequency + seed, y * frequency + seed) * amplitude;
+        // 	float noiseXZ = Mathf.PerlinNoise(x * frequency + seed, z * frequency + seed) * amplitude;
+        // 	float noiseYZ = Mathf.PerlinNoise(y * frequency + seed, z * frequency + seed) * amplitude;
 
-		// 	// Reverse of the permutations of noise for each individual axis
-		// 	float noiseYX = Mathf.PerlinNoise(y * frequency + seed, x * frequency + seed) * amplitude;
-		// 	float noiseZX = Mathf.PerlinNoise(z * frequency + seed, x * frequency + seed) * amplitude;
-		// 	float noiseZY = Mathf.PerlinNoise(z * frequency + seed, y * frequency + seed) * amplitude;
+        // 	// Reverse of the permutations of noise for each individual axis
+        // 	float noiseYX = Mathf.PerlinNoise(y * frequency + seed, x * frequency + seed) * amplitude;
+        // 	float noiseZX = Mathf.PerlinNoise(z * frequency + seed, x * frequency + seed) * amplitude;
+        // 	float noiseZY = Mathf.PerlinNoise(z * frequency + seed, y * frequency + seed) * amplitude;
 
-		// 	// Use the average of the noise functions
-		// 	noise += (noiseXY + noiseXZ + noiseYZ + noiseYX + noiseZX + noiseZY) / 6.0f;
+        // 	// Use the average of the noise functions
+        // 	noise += (noiseXY + noiseXZ + noiseYZ + noiseYX + noiseZX + noiseZY) / 6.0f;
 
-		// 	amplitude *= persistence;
-		// 	frequency *= 2.0f;
-		// }
+        // 	amplitude *= persistence;
+        // 	frequency *= 2.0f;
+        // }
 
-		// // Use the average of all octaves
-		// return noise / octave;
+        // // Use the average of all octaves
+        // return noise / octave;
 
         float xy = Mathf.PerlinNoise(x * frequency + seed, y * frequency + seed);
         float xz = Mathf.PerlinNoise(x * frequency + seed, z * frequency + seed);
@@ -125,9 +125,10 @@ public class plane_generator_cubes : MonoBehaviour
         float zy = Mathf.PerlinNoise(z * frequency + seed, y * frequency + seed);
 
         return (xy + xz + yz + yx + zx + zy) / 6.0f;
-	}
+    }
 
-    void MarchCubes() {
+    void MarchCubes()
+    {
         Debug.Log("Marching cubes");
 
         triangles = new List<plane_generator_cubes.Triangle>();
@@ -143,8 +144,10 @@ public class plane_generator_cubes : MonoBehaviour
                 {
                     List<plane_generator_cubes.Triangle> tris = MarchCube(x, y, z);
                     // add tris to triangles
-                    if (tris != null) {
-                        foreach (Triangle tri in tris) {
+                    if (tris != null)
+                    {
+                        foreach (Triangle tri in tris)
+                        {
                             triangles.Add(tri);
                         }
                     }
@@ -154,7 +157,8 @@ public class plane_generator_cubes : MonoBehaviour
         ProcessTriangles();
     }
 
-    List<plane_generator_cubes.Triangle> MarchCube(int x, int y, int z) {
+    List<plane_generator_cubes.Triangle> MarchCube(int x, int y, int z)
+    {
         int cubeIndex = 0;
         Vector3[] cubeCorners = new Vector3[8];
         float[] cubeValues = new float[8];
@@ -228,8 +232,10 @@ public class plane_generator_cubes : MonoBehaviour
 
         List<plane_generator_cubes.Triangle> tris = new List<plane_generator_cubes.Triangle>();
 
-        for (int i = 0; tables.getFromTriTable(cubeIndex, i) != -1; i += 3) {
-            tris.Add(new Triangle {
+        for (int i = 0; tables.getFromTriTable(cubeIndex, i) != -1; i += 3)
+        {
+            tris.Add(new Triangle
+            {
                 v1 = edgeVertices[tables.getFromTriTable(cubeIndex, i)],
                 v2 = edgeVertices[tables.getFromTriTable(cubeIndex, i + 1)],
                 v3 = edgeVertices[tables.getFromTriTable(cubeIndex, i + 2)]
@@ -240,7 +246,7 @@ public class plane_generator_cubes : MonoBehaviour
     }
 
     // implement interpolate
-    Vector3 VertexInterp(Vector3 p1, float v1, Vector3 p2, float v2) 
+    Vector3 VertexInterp(Vector3 p1, float v1, Vector3 p2, float v2)
     {
         if (Mathf.Abs((float)isoLevel - v1) < 0.0001) return p1;
         if (Mathf.Abs((float)isoLevel - v2) < 0.0001) return p2;
@@ -250,7 +256,7 @@ public class plane_generator_cubes : MonoBehaviour
         return new Vector3(p1.x + mu * (p2.x - p1.x), p1.y + mu * (p2.y - p1.y), p1.z + mu * (p2.z - p1.z));
     }
 
-    void ProcessTriangles() 
+    void ProcessTriangles()
     {
         mesh = gameObject.GetComponent<MeshFilter>().mesh;
         mesh.Clear();
@@ -259,7 +265,8 @@ public class plane_generator_cubes : MonoBehaviour
         mesh_triangles = new int[triangles.Count * 3];
         mesh_uvs = new Vector2[triangles.Count * 3];
 
-        for (int i = 0; i < triangles.Count; i++) {
+        for (int i = 0; i < triangles.Count; i++)
+        {
 
             mesh_vertices[i * 3].Set(triangles[i].v1.x, triangles[i].v1.y, triangles[i].v1.z);
             mesh_vertices[i * 3 + 1].Set(triangles[i].v2.x, triangles[i].v2.y, triangles[i].v2.z);
@@ -279,13 +286,8 @@ public class plane_generator_cubes : MonoBehaviour
 
         }
 
-        mesh.vertices = mesh_vertices;
-        mesh.triangles = mesh_triangles;
-        mesh.uv = mesh_uvs;
 
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-
+        // note mesh gets set in SetColor()
     }
 
     void Update()
@@ -294,6 +296,7 @@ public class plane_generator_cubes : MonoBehaviour
         {
             CreatePlane();
             MarchCubes();
+            SetColors();
             // p_offset_z += scroll_speed;
         }
     }
@@ -304,97 +307,25 @@ public class plane_generator_cubes : MonoBehaviour
         triangles = new List<plane_generator_cubes.Triangle>();
     }
 
-    void SetPerlin()
-    {
-            // for (int i = 0; i < vertices.Length; i++)
-            // {
-            //     float new_y = Mathf.PerlinNoise(vertices[i].x * frequency + p_offset_x, vertices[i].z * frequency + p_offset_z);
-            //     float new_y2 = Mathf.PerlinNoise(vertices[i].x * frequency2 + p_offset_x2, vertices[i].z * frequency2 + p_offset_z2);
-            //     float new_y3 = Mathf.PerlinNoise(vertices[i].x * 3, vertices[i].z * 3) * 0.2f;
-
-            //     //Debug.Log(vertices[i].x * 3.23f);
-            //     //Debug.Log(new_y);
-            //     new_y = new_y * heightScale + new_y2 * heightScale2;
-            //     new_y = Mathf.Clamp(new_y, lowerbound, upperbound);
-            // vertices[i] = new Vector3(vertices[i].x, new_y + new_y3, vertices[i].z);
-            // }
-            return;
-    }
-
     void SetColors()
     {
-            // for (int i = 0; i < vertices.Length; i++)
-            // {
-            //     float normalizedHeight = vertices[i].y / heightScale; // Normalize height to range [0, 1]
-            //     colors[i] = new Color(1.0f - normalizedHeight, 0.0f, normalizedHeight);
-            // }
-            return;
+        colors = new Color[triangles.Count * 3];
+        for (int i = 0; i < mesh_vertices.Length; i++)
+        {
+            //float normalizedHeight = vertices[i].y / heightScale; // Normalize height to range [0, 1]
+            float normalizedHeight = Mathf.InverseLerp(0f, 32f, mesh_vertices[i].y);
+
+            colors[i] = worldColor.Evaluate(Mathf.Clamp(normalizedHeight, 0.0f, 1.0f));
+            //colors[i] = new Color(mesh_vertices.Length / (i+1), mesh_vertices.Length / (i + 1), mesh_vertices.Length / (i + 1));
+            //colors[i] = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+        }
+        //Debug.Log
+        mesh.vertices = mesh_vertices;
+        mesh.triangles = mesh_triangles;
+        //mesh.uv = mesh_uvs;
+        mesh.colors = colors;
+
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
     }
-
-
-    void GenerateTexture()
-    {
-            // texture = new Texture2D(gridSize + 1, gridSize + 1);
-
-            // for (int z = 0; z <= gridSize; z++)
-            // {
-            //     for (int x = 0; x <= gridSize; x++)
-            //     {
-            //         float normalizedHeight = vertices[z * (gridSize + 1) + x].y / heightScale;
-            //         Color color = new Color(1.0f - normalizedHeight, 0.0f, normalizedHeight);
-            //         texture.SetPixel(x, z, color);
-            //     }
-            // }
-
-            // texture.Apply();
-            return;
-    }
-
-    void ApplyTextureToMesh()
-    {
-            //   Material material = GetComponent<Renderer>().material;
-            // material.mainTexture = texture;
-            return;
-    }
-
-    // void UpdatePlane()
-    // {
-    //     mesh.Clear();
-    //     // mesh.vertices = vertices;
-    //     // mesh.vertices = vertices.ToArray();
-    //     mesh.vertices = mesh_vertices;
-    //     mesh.triangles = mesh_triangles;
-    //     mesh.uv = mesh_uvs;
-    //     // mesh.triangles = triangles;
-    //     // mesh.triangles = triangles.ToArray();
-    //     //mesh.colors = colors; // Assign colors to the mesh
-
-    //     mesh.RecalculateNormals();
-    //     mesh.RecalculateBounds();
-
-
-    //     /*mesh.Clear();
-    //     mesh.vertices = vertices;
-    //     mesh.triangles = triangles;
-    //     mesh.colors = colors; // Colors are not used since we're using a texture
-
-    //     // Calculate normals manually for each face
-    //     Vector3[] normals = new Vector3[vertices.Length];
-    //     for (int i = 0; i < triangles.Length; i += 3)
-    //     {
-    //         Vector3 v1 = vertices[triangles[i + 1]] - vertices[triangles[i]];
-    //         Vector3 v2 = vertices[triangles[i + 2]] - vertices[triangles[i]];
-    //         Vector3 normal = Vector3.Cross(v1, v2).normalized;
-
-    //         normals[triangles[i]] += normal;
-    //         normals[triangles[i + 1]] += normal;
-    //         normals[triangles[i + 2]] += normal;
-    //     }
-
-    //     // Assign normals to the mesh
-    //     mesh.normals = normals;
-
-    //     // Recalculate bounds to avoid clipping issues
-    //     mesh.RecalculateBounds();*/
-    // }
 }
