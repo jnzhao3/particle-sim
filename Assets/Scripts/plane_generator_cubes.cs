@@ -15,33 +15,41 @@ public class plane_generator_cubes : MonoBehaviour
     [Header("Efficiency settings:")]
     public bool realtime_update = false; // Adjust this for depth/thickness
     [Header("Mesh Settings")]
-    public int gridSize = 64; // Change this to set the number of grid cells
-    public float planeSize = 16f;
-    public float thickness = 1.0f; // Adjust this for depth/thickness
+    public int gridSize = 32; // Change this to set the number of grid cells
+    // public float planeSize = 16f;
+    public float xSize = 16f;
+    public float ySize = 16f;
+    public float zSize = 5f;
+    // public float thickness = 1.0f; // Adjust this for depth/thickness
     //public Gradient gradient;
-    [Range(0.0f, 10.0f)]
-    public float lowerbound = 0.5f;
-    [Range(0.0f, 10.0f)]
-    public float upperbound = 2f;
+    // [Range(0.0f, 10.0f)]
+    // public float lowerbound = 0.5f;
+    // [Range(0.0f, 10.0f)]
+    // public float upperbound = 2f;
 
-    [Header("Perlin Noise Settings")]
-    [Range(0.1f, 10.0f)]
+    // [Header("Perlin Noise Settings")]
+    // [Range(0.1f, 10.0f)]
+    // public float frequency = 0.5f;
+    // [Range(0.1f, 10.0f)]
+    // public float heightScale = 2f;
+    // public float p_offset_x = 8f;
+    // public float p_offset_z = 8f;
+    // [Range(0.0f, 1.0f)]
+    // public float scroll_speed = 0.0f;
+
+
+    // [Header("Perlin Noise 2 Settings")]
+    // [Range(0.1f, 10.0f)]
+    // public float frequency2 = 0.5f;
+    // [Range(0.1f, 10.0f)]
+    // // public float heightScale2 = 2f;
+    // public float p_offset_x2 = 8f;
+    // public float p_offset_z2 = 8f;
+
+    [Header("Perlin Noise 3 Settings")]
+    [Range(0.1f, 1.0f)]
     public float frequency = 0.5f;
-    [Range(0.1f, 10.0f)]
-    public float heightScale = 2f;
-    public float p_offset_x = 8f;
-    public float p_offset_z = 8f;
-    [Range(0.0f, 1.0f)]
-    public float scroll_speed = 0.0f;
-
-
-    [Header("Perlin Noise 2 Settings")]
-    [Range(0.1f, 10.0f)]
-    public float frequency2 = 0.5f;
-    [Range(0.1f, 10.0f)]
-    public float heightScale2 = 2f;
-    public float p_offset_x2 = 8f;
-    public float p_offset_z2 = 8f;
+    public int seed = 42;
 
     Color[] colors;
 
@@ -82,17 +90,23 @@ public class plane_generator_cubes : MonoBehaviour
             {
                 for (int z = 0; z < gridSize; z++)
                 {
-                    float xPos = (float)x / gridSize * planeSize - planeSize / 2.0f;
-                    float zPos = (float)z / gridSize * planeSize - planeSize / 2.0f;
-                    float yPos = (float)y / gridSize * planeSize - planeSize / 2.0f;
+                    float xPos = (float)x / gridSize * xSize - xSize / 2.0f;
+                    float zPos = (float)z / gridSize * ySize - ySize / 2.0f;
+                    float yPos = (float)y / gridSize * zSize - zSize / 2.0f;
                     Grid[x * gridSize * gridSize + y * gridSize + z] = new Vector3(xPos, yPos, zPos);
                 }
             }
         }
     }
 
-    float Noise3D(float x, float y, float z, float frequency = 0.2f, float amplitude = 1, float persistence = 0.1f, int octave = 1, int seed = 12)
+    float Noise3D(float x, float y, float z, float amplitude = 1, float persistence = 0.1f, int octave = 1)
     {
+
+        float frequency = this.frequency;
+        int seed = this.seed;
+        // x = x / planeSize;
+        // y = y / planeSize;
+        // z = z / planeSize;
         // float noise = 0.0f;
 
         // for (int i = 0; i < octave; ++i)
@@ -294,7 +308,8 @@ public class plane_generator_cubes : MonoBehaviour
     {
         if (realtime_update)
         {
-            CreatePlane();
+            InitGrid();
+            // CreatePlane();
             MarchCubes();
             SetColors();
             // p_offset_z += scroll_speed;
