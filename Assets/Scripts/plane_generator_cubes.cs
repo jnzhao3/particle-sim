@@ -133,7 +133,7 @@ public class plane_generator_cubes : MonoBehaviour
         triangles = new List<plane_generator_cubes.Triangle>();
         vertices = new List<Vector3>();
 
-        int triIndex = 0;
+        // int triIndex = 0;
 
         for (int x = 0; x < gridSize - 1; x++) // TODO: this is hacky, fix
         {
@@ -159,11 +159,11 @@ public class plane_generator_cubes : MonoBehaviour
         Vector3[] cubeCorners = new Vector3[8];
         float[] cubeValues = new float[8];
 
-        public double[] cubeCoords = table.cubeCoords;
+        double[,] cubeCoords = tables.cubeCoords;
 
         for (int i = 0; i < 8; i++)
         {
-            cubeCorners[i] = Grid[(x + cubeCoords[0]) * gridSize * gridSize + (y + cubeCoords[1]) * gridSize + z + cubeCoords[2]];
+            cubeCorners[i] = Grid[(x + (int)cubeCoords[i, 0]) * gridSize * gridSize + (y + (int)cubeCoords[i, 1]) * gridSize + z + (int)cubeCoords[i, 2]];
         }
 
         // cubeCorners[0] = Grid[x * gridSize * gridSize + y * gridSize + z]; // 0, 0, 0
