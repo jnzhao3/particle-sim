@@ -8,6 +8,7 @@ public class plane_generator : MonoBehaviour
     public static Mesh mesh;
 
     public static Vector3[] vertices;
+    public static Vector3[] positions; //added
     int[] triangles;
     //public int gridSize = 64; // Change this to set the number of grid cells
     //float planeSize = 16f; // Change this to set the overall size of the plane
@@ -28,7 +29,7 @@ public class plane_generator : MonoBehaviour
 
     [Header("Mesh Settings")]
     public static int gridSize = 64; // Change this to set the number of grid cells
-    public float planeSize = 16f;
+    public static float planeSize = 16f;
     public float thickness = 1.0f; // Adjust this for depth/thickness
     public Gradient worldColor;
     [Range(0.0f, 10.0f)]
@@ -175,6 +176,7 @@ public class plane_generator : MonoBehaviour
     void CreatePlane()
     {
         vertices = new Vector3[(gridSize + 1) * (gridSize + 1)]; // Increase vertex count for grid corners
+        // positions = new Vector3[(gridSize + 1) * (gridSize + 1)]; //added
         triangles = new int[gridSize * gridSize * 6]; // Each grid cell has 2 triangles (6 vertices)
         colors = new Color[vertices.Length]; // Initialize color array
 
@@ -185,6 +187,7 @@ public class plane_generator : MonoBehaviour
             {
                 float xPos = (float)x / gridSize * planeSize - planeSize / 2.0f;
                 float zPos = (float)z / gridSize * planeSize - planeSize / 2.0f;
+                // positions[zPos * (planeSize + 1) + xPos] = new Vector3(x, 0, z); //added
                 vertices[z * (gridSize + 1) + x] = new Vector3(xPos, 0, zPos);
             }
         }
