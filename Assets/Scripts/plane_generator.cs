@@ -8,7 +8,7 @@ public class plane_generator : MonoBehaviour
     public static Mesh mesh;
 
     public static Vector3[] vertices;
-    public static Vector3[] positions; //added
+    // public static Vector3[] positions; //added
     int[] triangles;
     //public int gridSize = 64; // Change this to set the number of grid cells
     //float planeSize = 16f; // Change this to set the overall size of the plane

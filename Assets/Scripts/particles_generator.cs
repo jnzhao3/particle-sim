@@ -7,10 +7,11 @@ using System.Linq;
 public class ParticleDisplay : MonoBehaviour
 {
     [Header("Particle Attributes:")]
-    public float scalingFactor = 0.1f; 
-    public Vector3 initialVelocity = new Vector3(0, -9.8f * 0.02f, 0); //Time.fixedDeltaTime = 0.02
+    public float scalingFactor = 0.1f; //scale = diameter of particles
+    public Vector3 initialVelocity = new Vector3(0, -9.8f, 0); //Time.fixedDeltaTime = 0.02
     public float dampingFactor = 0.1f;
     public int planeRange = 5;
+    public int numParticlesToAdd = 25;
 
     
     public GameObject prefab;
@@ -25,14 +26,14 @@ public class ParticleDisplay : MonoBehaviour
 
     void Start()
     {
-        // scale = 0.1f;
         // Initialize particles list from ParticlesList constructor
-        particlesList = new ParticlesList(scalingFactor, initialVelocity, planeRange);
+        particlesList = new ParticlesList(scalingFactor, initialVelocity, planeRange, numParticlesToAdd);
         particles = particlesList.particles;
  
         all_particles_go = new List<GameObject>();
 
         vertices = plane_generator.vertices;
+        // Debug.Log(vertices);
         gridSize = plane_generator.gridSize;
         planeSize = plane_generator.planeSize;
 
@@ -54,13 +55,23 @@ public class ParticleDisplay : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Increment the counter
-        fixedUpdateCounter++;
+        //Update particle positions
+        for (int i = 0; i < particles.Count; i++)
+        {
+            // Handle collisions
+            particlesList.HandleCollisions(particles[i], vertices, gridSize, planeSize, dampingFactor);
+            particles[i].position += particles[i].velocity * Time.fixedDeltaTime;
 
+            //Update game object position
+            all_particles_go[i].transform.position = particles[i].position;
+        }
+
+        fixedUpdateCounter++;
+        //Add more particles
         if (fixedUpdateCounter % 100 == 0)
         {
             int prevNumParticles = particles.Count;
-            particlesList.AddParticles(5, scalingFactor, initialVelocity, planeRange);
+            particlesList.AddParticles(5, scalingFactor, initialVelocity, planeRange, numParticlesToAdd);
             // Iterate through new particle objects
             foreach (SandParticle particle in particles.Skip(prevNumParticles))
             {
@@ -73,20 +84,6 @@ public class ParticleDisplay : MonoBehaviour
             }
             numParticles = particles.Count;
         }
-
-
-
-
-        for (int i = 0; i < particles.Count; i++)
-        {
-            // Handle collisions
-            particlesList.HandleCollisions(particles[i], vertices, gridSize, planeSize, dampingFactor);
-            particles[i].position += particles[i].velocity * Time.fixedDeltaTime;
-
-            //Update game object position
-            all_particles_go[i].transform.position = particles[i].position;
-        }
-
     }
 }
 
@@ -103,7 +100,7 @@ public class SandParticle
     public SandParticle(Vector3 pos, Vector3 vel, Vector3 accel, float ms, float size)
     {
         position = pos;
-        radius = size /2 ;
+        radius = size / 2 ;
         velocity = vel;
         acceleration = accel;
         mass = ms;
@@ -117,44 +114,36 @@ public class ParticlesList
     public Vector3 center;
     public float spacing;
     // Constructor
-    public ParticlesList(float size, Vector3 initial_velocity, int plane_range)
+    public ParticlesList(float size, Vector3 initial_velocity, int plane_range, int numParticlesToAdd)
     {
         particles = new List<SandParticle>();
-
-        int numParticlesPerSide = 5; // Number of particles per side
-        spacing = 2.0f; // Spacing between particles
         center = new Vector3(0, 20, 0); // Center of the square (vertical)
 
-        for (int i = 0; i < numParticlesPerSide; i++)
+        for (int i = 0; i < numParticlesToAdd; i++)
         {
-            for (int j = 0; j < numParticlesPerSide; j++)
-            {
-                // Calculate random x and z coordinates within specified ranges
-                float randomX = UnityEngine.Random.Range(-plane_range, plane_range);
-                float randomZ = UnityEngine.Random.Range(-plane_range, plane_range);
+            // Calculate random x and z coordinates within specified ranges
+            float randomX = UnityEngine.Random.Range(-plane_range, plane_range);
+            float randomZ = UnityEngine.Random.Range(-plane_range, plane_range);
 
-                // Calculate the position of the particle
-                float x = center.x + randomX;
-                float y = UnityEngine.Random.Range(10, 40); // Random y coordinate
-                float z = center.z + randomZ;
+            // Calculate the position of the particle
+            float x = center.x + randomX;
+            float y = UnityEngine.Random.Range(10, 40); // Random y coordinate
+            float z = center.z + randomZ;
 
-                Vector3 position = new Vector3(x, y, z);
+            Vector3 position = new Vector3(x, y, z);
 
-                // Set direction based on gravity
-                float ms = 3;
-                Vector3 accel = new Vector3(0, -0.08f, 0);
+            // Set direction based on gravity
+            float ms = 3;
+            Vector3 accel = new Vector3(0, -0.08f, 0);
 
-                // Add particle to the list
-                particles.Add(new SandParticle(position, initial_velocity, accel, ms, size));
-            }
+            // Add particle to the list
+            particles.Add(new SandParticle(position, initial_velocity, accel, ms, size));
         }
     }
 
-    public void AddParticles(float num, float size, Vector3 initial_velocity, int plane_range)
+    public void AddParticles(float num, float size, Vector3 initial_velocity, int plane_range, int numParticlesToAdd)
     {
-        for (int i = 0; i < num; i++)
-        {
-            for (int j = 0; j < num; j++)
+            for (int i = 0; i < numParticlesToAdd; i++) 
             {
                 float randomX = UnityEngine.Random.Range(-plane_range, plane_range);
                 float randomZ = UnityEngine.Random.Range(-plane_range, plane_range);
@@ -173,7 +162,6 @@ public class ParticlesList
                 // Add particle to the list
                 particles.Add(new SandParticle(position, initial_velocity, accel, ms, size));
             }
-        }
     }
 
     public void HandleCollisions(SandParticle particle, Vector3[] vertices, int gridSize, float planeSize, float damping_factor)
@@ -191,6 +179,9 @@ public class ParticlesList
                         float addOrSubtractY = UnityEngine.Random.Range(0, 2) == 0 ? -1 : 1; // 0 means subtract, 1 means add
                         particle.position.x += addOrSubtractX * particle.radius;
                         particle.position.y += addOrSubtractY * particle.radius;
+
+                        particles[j].position.x -= addOrSubtractX * particle.radius;
+                        particles[j].position.y -= addOrSubtractY * particle.radius;
  
                         // Apply elastic collision forces
                         // ApplyElasticCollision(particle, particles[j]);
@@ -252,7 +243,6 @@ public class ParticlesList
         }
     }
         
-    
     private Vector3 CalculateTangentPlaneNormal(Vector3 position, Vector3[] vertices, int gridSize)
     {   
         // Calculate the normal vector of the tangent plane at a given position on the terrain
@@ -277,6 +267,7 @@ public class ParticlesList
     {
         return Vector3.Distance(particle1.position, particle2.position) < (particle2.radius + particle1.radius);
     }
+
     private void ApplyElasticCollision(SandParticle particle1, SandParticle particle2)
     {
         // Calculate relative velocity
